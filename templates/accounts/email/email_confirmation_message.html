@@ -1,0 +1,53 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% trans "Confirm Your Email" %}</title>
+  <style>
+    body {
+      font-family: Futura, sans-serif;
+      background-color: #000;
+      color: #fff;
+      padding: 30px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background-color: #1a1a1a;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #eeff00;
+    }
+    h2 {
+      color: #ffdd00;
+      margin-bottom: 20px;
+    }
+    a.button {
+      display: inline-block;
+      background: #ffee00;
+      color: #111;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    p {
+      line-height: 1.8;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Confirm Your Email</h2>
+    <p>Hey {{ user.username }},</p>
+    <p>Thanks for signing up with Sunset Uploader.</p>
+    <p>Please click the button below to confirm your email address:</p>
+    <p><a href="{{ activate_url }}" class="button">Confirm Email</a></p>
+    <p>If you didn’t sign up, you can safely ignore this email.</p>
+    <p style="margin-top: 30px;">– The Sunset Uploader Team</p>
+  </div>
+</body>
+</html>
