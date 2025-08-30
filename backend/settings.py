@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,21 +22,47 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+import boto3
+from botocore.client import Config
+
+R2_ENDPOINT_URL = os.getenv('R2_ENDPOINT_URL')
+R2_ACCESS_KEY_ID = os.getenv('R2_ACCESS_KEY_ID')
+R2_SECRET_ACCESS_KEY = os.getenv('R2_SECRET_ACCESS_KEY')
+
+if R2_ENDPOINT_URL and R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY:
+    s3 = boto3.client(
+        's3',
+        endpoint_url=R2_ENDPOINT_URL,
+        aws_access_key_id=R2_ACCESS_KEY_ID,
+        aws_secret_access_key=R2_SECRET_ACCESS_KEY,
+        config=Config(signature_version='s3v4'),
+        region_name='auto',
+    )
+else:
+    s3 = None  # Optional: only initialize if env vars are present
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2=9u!-n)$6^@+$g0se)m7fg%*spzd%ypcaa_^z99^n254685e^'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "sunset-backend.onrender.com",
+    "sunsetuploader.com",
+    "www.sunsetuploader.com",
+    "sunset-frontend.netlify.app"
+]
 
+CORS_ALLOWED_ORIGINS = [
+    "https://sunset-frontend.netlify.app",
+    "https://sunsetuploader.com",
+]
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -104,29 +131,7 @@ AUTHENTICATION_BACKENDS = (
 REST_AUTH_SERIALIZERS = {
     "TOKEN_OBTAIN_SERIALIZER": "accounts.jwt.VerifiedEmailTokenSerializer",
 }
-'''
-ACCOUNT_ADAPTER = "accounts.adapters.CustomAccountAdapter"
 
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
-ACCOUNT_UNIQUE_EMAIL = True
-AUTH_USER_MODEL = 'api.CustomUser'
-
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
-EMAIL_HOST = os.getenv('EMAIL_HOST')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS') == 'True'
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
-
-ACCOUNT_LOGOUT_REDIRECT_URL = '/login/'  # Set this to your frontend login route
-ACCOUNT_SIGNUP_REDIRECT_URL = '/login/'  # Or wherever you want
-'''
 # Email + allauth
 ACCOUNT_ADAPTER = "accounts.adapters.CustomAccountAdapter"
 ACCOUNT_EMAIL_REQUIRED = True
@@ -155,6 +160,15 @@ ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Sunset Uploader] "
 ACCOUNT_LOGOUT_REDIRECT_URL = "/login/"
 ACCOUNT_SIGNUP_REDIRECT_URL = "/login/"
 
+INSTALLED_APPS += ['storages']
+
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+AWS_S3_ENDPOINT_URL = os.getenv("R2_ENDPOINT_URL")
+AWS_STORAGE_BUCKET_NAME = os.getenv("R2_BUCKET_NAME")
+AWS_ACCESS_KEY_ID = os.getenv("R2_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY")
+
 # JWT (long-lived access token only)
 REST_USE_JWT = True
 SIMPLE_JWT = {
@@ -162,10 +176,7 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),   # not used by your flow, but must be present
 }
 
-
-
 # Stripe stuff
-
 
 STRIPE_PUBLISHABLE_KEY = "STRIPE_PUBLISHABLE_KEY"
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
@@ -175,14 +186,17 @@ STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
+'''
+DATABASES = {
+    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -214,6 +228,13 @@ USE_I18N = True
 
 USE_TZ = True
 
+# Static files
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Media files (for uploaded content)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / "media"
 
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:5173",  # Vite dev server
@@ -225,7 +246,7 @@ CORS_ALLOW_CREDENTIALS = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
