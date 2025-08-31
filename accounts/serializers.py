@@ -2,7 +2,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
-from allauth.account.utils import send_email_confirmation
+from allauth.account.adapter import get_adapter
 
 User = get_user_model()
 
@@ -11,7 +11,6 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        # If you have a custom user, ensure these fields exist (username/email/password)
         fields = ["username", "email", "password"]
 
     def validate_password(self, value):
@@ -19,8 +18,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        # inactive until email confirm
+        # Create inactive user until email confirmation
         user = User.objects.create_user(is_active=False, **validated_data)
         request = self.context.get("request")
-        send_email_confirmation(request, user)
+        try:
+            get_adapter().send_confirmation_mail(request, user)
+        except Exception as e:
+            print(f"Email confirmation failed: {e}")
         return user
