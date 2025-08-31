@@ -1,8 +1,10 @@
-# accounts/serializers.py
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from allauth.account.adapter import get_adapter
+import logging
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -21,8 +23,15 @@ class RegisterSerializer(serializers.ModelSerializer):
         # Create inactive user until email confirmation
         user = User.objects.create_user(is_active=False, **validated_data)
         request = self.context.get("request")
+
         try:
             get_adapter().send_confirmation_mail(request, user)
+            logger.info(f"Confirmation email sent to {user.email}")
         except Exception as e:
-            print(f"Email confirmation failed: {e}")
+            logger.exception("Failed to send confirmation email")
+            # If in DEBUG mode, raise for visibility (optional)
+            from django.conf import settings
+            if getattr(settings, "DEBUG", False):
+                raise
+
         return user
