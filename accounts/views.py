@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from allauth.account.models import EmailAddress
-from allauth.account.utils import send_email_confirmation
+from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailConfirmationHMAC
 
 from .serializers import RegisterSerializer
@@ -35,9 +35,10 @@ class ResendConfirmationView(APIView):
 
     def post(self, request):
         email = (request.data.get("email") or "").lower()
+        from allauth.account.models import EmailAddress
         try:
             email_addr = EmailAddress.objects.get(email=email)
-            send_email_confirmation(request, email_addr.user)
+            get_adapter().send_confirmation_mail(request, email_addr.user)
         except EmailAddress.DoesNotExist:
             pass
         return Response({"detail": "If that email exists, a new confirmation link was sent."})
