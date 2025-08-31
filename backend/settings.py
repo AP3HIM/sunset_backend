@@ -132,6 +132,14 @@ REST_AUTH_SERIALIZERS = {
     "TOKEN_OBTAIN_SERIALIZER": "accounts.jwt.VerifiedEmailTokenSerializer",
 }
 
+# settings.py (add)
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "root": {"handlers": ["console"], "level": "INFO"},
+}
+
 # Email + allauth
 ACCOUNT_ADAPTER = "accounts.adapters.CustomAccountAdapter"
 ACCOUNT_EMAIL_REQUIRED = True
