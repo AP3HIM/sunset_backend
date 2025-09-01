@@ -54,7 +54,8 @@ ALLOWED_HOSTS = [
     "sunset-backend.onrender.com",
     "sunsetuploader.com",
     "www.sunsetuploader.com",
-    "sunset-frontend.netlify.app"
+    "sunset-frontend.netlify.app",
+    "api.sunsetuploader.com",
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -132,7 +133,6 @@ REST_AUTH_SERIALIZERS = {
     "TOKEN_OBTAIN_SERIALIZER": "accounts.jwt.VerifiedEmailTokenSerializer",
 }
 
-# settings.py (add)
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
