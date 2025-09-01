@@ -61,6 +61,7 @@ ALLOWED_HOSTS = [
 CORS_ALLOWED_ORIGINS = [
     "https://sunset-frontend.netlify.app",
     "https://sunsetuploader.com",
+    "https://www.sunsetuploader.com",
 ]
 
 # Application definition
@@ -250,11 +251,14 @@ CORS_ORIGIN_WHITELIST = [
 
 CORS_ALLOW_CREDENTIALS = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-
+CSRF_TRUSTED_ORIGINS = [
+    "https://sunset-frontend.netlify.app",
+    "https://sunsetuploader.com",
+    "https://www.sunsetuploader.com",
+    "https://api.sunsetuploader.com",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
