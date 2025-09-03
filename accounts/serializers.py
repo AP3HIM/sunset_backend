@@ -4,9 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from allauth.account.utils import setup_user_email
 from allauth.account.adapter import get_adapter
-from allauth.account.models import EmailAddress
-from allauth.account.models import EmailConfirmationHMAC
-
+from allauth.account.models import EmailAddress, EmailConfirmationHMAC
 import logging
 
 logger = logging.getLogger(__name__)
@@ -29,8 +27,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
 
         try:
-            # Ensure EmailAddress exists
-            setup_user_email(request, user, [])
+            # Ensure EmailAddress exists and is linked
+            setup_user_email(request, user, [user.email])
 
             # Grab the primary EmailAddress
             email_address = EmailAddress.objects.get(user=user, email=user.email)
@@ -49,4 +47,3 @@ class RegisterSerializer(serializers.ModelSerializer):
                 raise
 
         return user
-
