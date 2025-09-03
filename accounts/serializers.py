@@ -2,7 +2,8 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
-from allauth.account.utils import setup_user_email, send_email_confirmation
+from allauth.account.utils import setup_user_email
+from allauth.account.adapter import get_adapter
 import logging
 
 logger = logging.getLogger(__name__)
@@ -32,7 +33,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             setup_user_email(request, user, [])
 
             # Trigger Allauth’s built-in confirmation flow
-            send_email_confirmation(request, user)
+            get_adapter(request).send_confirmation_mail(request, user)
 
             logger.info(f"[accounts] Sent confirmation email to {user.email}")
         except Exception as e:
