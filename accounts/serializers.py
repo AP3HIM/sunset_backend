@@ -27,17 +27,19 @@ class RegisterSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
 
         try:
-            # Ensure EmailAddress exists and is linked
+            # 1️ Ensure EmailAddress exists
             setup_user_email(request, user, [user.email])
 
-            # Grab the primary EmailAddress
+            # 2️ Grab the primary EmailAddress object
             email_address = EmailAddress.objects.get(user=user, email=user.email)
+            
 
-            # Create an EmailConfirmation object
+            # 3️ Create EmailConfirmation object
             confirmation = EmailConfirmationHMAC(email_address)
 
-            # Send via adapter (signup=True since this is registration)
+            # 4 Send confirmation via adapter
             get_adapter(request).send_confirmation_mail(request, confirmation, signup=True)
+            logger.info(f"Confirm URL: {get_adapter(request).get_email_confirmation_url(request, confirmation)}")
 
             logger.info(f"[accounts] Sent confirmation email to {user.email}")
         except Exception as e:
