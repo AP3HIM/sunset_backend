@@ -56,6 +56,10 @@ ALLOWED_HOSTS = [
     "www.sunsetuploader.com",
     "sunset-frontend.netlify.app",
     "api.sunsetuploader.com",
+    '''
+    "127.0.0.1",
+    "localhost",
+    '''
 ]
 
 CORS_ALLOWED_ORIGINS = [
