@@ -5,6 +5,7 @@ from rest_framework import serializers
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
 import logging
+from allauth.account.models import EmailAddress
 
 logger = logging.getLogger(__name__)
 
@@ -27,10 +28,15 @@ class RegisterSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
 
         try:
-            # Register email with Allauth (creates EmailAddress object)
-            setup_user_email(request, user, [])
+            # Ensure EmailAddress is created
+            EmailAddress.objects.create(
+                user=user,
+                email=user.email,
+                verified=False,
+                primary=True,
+            )
 
-            # Trigger Allauth's confirmation flow
+            # Trigger confirmation flow
             get_adapter().send_confirmation_mail(request, user)
             logger.info(f"Confirmation email sent to {user.email}")
 
