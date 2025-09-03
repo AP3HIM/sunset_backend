@@ -4,6 +4,9 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from allauth.account.utils import setup_user_email
 from allauth.account.adapter import get_adapter
+from allauth.account.models import EmailAddress
+from allauth.account.models import EmailConfirmationHMAC
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -22,18 +25,21 @@ class RegisterSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        """
-        Create an inactive user, attach EmailAddress, and send confirmation.
-        """
         user = User.objects.create_user(is_active=False, **validated_data)
         request = self.context.get("request")
 
         try:
-            # Ensure EmailAddress exists/linked
+            # Ensure EmailAddress exists
             setup_user_email(request, user, [])
 
-            # Trigger Allauth’s built-in confirmation flow
-            get_adapter(request).send_confirmation_mail(request, user)
+            # Grab the primary EmailAddress
+            email_address = EmailAddress.objects.get(user=user, email=user.email)
+
+            # Create an EmailConfirmation object
+            confirmation = EmailConfirmationHMAC(email_address)
+
+            # Send via adapter (signup=True since this is registration)
+            get_adapter(request).send_confirmation_mail(request, confirmation, signup=True)
 
             logger.info(f"[accounts] Sent confirmation email to {user.email}")
         except Exception as e:
@@ -43,3 +49,4 @@ class RegisterSerializer(serializers.ModelSerializer):
                 raise
 
         return user
+
