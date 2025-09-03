@@ -7,6 +7,7 @@ from .views import (
     ResendConfirmationView,
     redirect_confirm_email,
     VerifiedEmailTokenView,
+    debug_send_mail,
 )
 
 urlpatterns = [
@@ -26,4 +27,6 @@ urlpatterns = [
 
     # allauth registration endpoints used by dj_rest_auth (keep)
     path("auth/", include("dj_rest_auth.registration.urls")),
+
+    path("debug-send/", debug_send_mail, name="debug_send_mail"),
 ]
