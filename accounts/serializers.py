@@ -1,7 +1,9 @@
+# accounts/serializers.py
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from allauth.account.adapter import get_adapter
+from allauth.account.utils import setup_user_email
 import logging
 
 logger = logging.getLogger(__name__)
@@ -25,12 +27,15 @@ class RegisterSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
 
         try:
-            logger.info(f"Request in serializer: {request}")
+            # Register email with Allauth (creates EmailAddress object)
+            setup_user_email(request, user, [])
+
+            # Trigger Allauth's confirmation flow
             get_adapter().send_confirmation_mail(request, user)
             logger.info(f"Confirmation email sent to {user.email}")
+
         except Exception as e:
             logger.exception("Failed to send confirmation email")
-            # If in DEBUG mode, raise for visibility (optional)
             from django.conf import settings
             if getattr(settings, "DEBUG", False):
                 raise
