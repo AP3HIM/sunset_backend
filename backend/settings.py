@@ -143,7 +143,14 @@ LOGGING = {
     "disable_existing_loggers": False,
     "handlers": {"console": {"class": "logging.StreamHandler"}},
     "root": {"handlers": ["console"], "level": "INFO"},
+    "loggers": {
+        "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
+        "django.core.mail": {"handlers": ["console"], "level": "DEBUG", "propagate": False},
+        "allauth": {"handlers": ["console"], "level": "DEBUG", "propagate": False},
+        "accounts": {"handlers": ["console"], "level": "DEBUG", "propagate": False},
+    },
 }
+
 
 # ─── Allauth behaviour ──────────────
 ACCOUNT_ADAPTER = "accounts.adapters.CustomAccountAdapter"
