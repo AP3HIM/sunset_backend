@@ -80,3 +80,19 @@ def redirect_confirm_email(request, key):
             user.save(update_fields=["is_active"])
 
     return redirect("https://sunsetuploader.com/login")
+
+@api_view(["POST"])
+@permission_classes([permissions.AllowAny])
+def debug_send_mail(request):
+    to = request.data.get("to")
+    if not to:
+        return Response({"error": "provide 'to'"}, status=400)
+    from django.core.mail import send_mail
+    sent = send_mail(
+        subject="Sunset SMTP debug",
+        message="If you receive this, Brevo SMTP from Render works.",
+        from_email=None,  # uses DEFAULT_FROM_EMAIL
+        recipient_list=[to],
+        fail_silently=False,
+    )
+    return Response({"sent": sent})
