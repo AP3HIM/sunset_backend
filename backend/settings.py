@@ -145,48 +145,60 @@ LOGGING = {
     "root": {"handlers": ["console"], "level": "INFO"},
 }
 
-# Email + allauth
+# ─── Allauth behaviour ──────────────
 ACCOUNT_ADAPTER = "accounts.adapters.CustomAccountAdapter"
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = "username_email"  # ok
+
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
+ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 
-# If you truly have a custom user:
-# AUTH_USER_MODEL = 'api.CustomUser'
-# Otherwise, remove that line and use the default User
+# Modern login flags (preferred over old ACCOUNT_AUTHENTICATION_METHOD)
+ACCOUNT_LOGIN_METHODS = {"username", "email"}  # allow login via username or email
+ACCOUNT_SIGNUP_FIELDS = ["username*", "email*", "password1*", "password2*"]
 
-EMAIL_BACKEND       = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST          = os.getenv('EMAIL_HOST', 'smtp-relay.brevo.com')
-EMAIL_PORT          = int(os.getenv('EMAIL_PORT', 587))
-EMAIL_USE_TLS       = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
-EMAIL_HOST_USER     = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL  = os.getenv('DEFAULT_FROM_EMAIL', 'Sunset Uploader <noreply@sunsetuploader.com>')
-
+# Redirect behavior
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Sunset Uploader] "
-
+LOGIN_REDIRECT_URL = "/"  # default landing after login
 ACCOUNT_LOGOUT_REDIRECT_URL = "/login/"
-ACCOUNT_SIGNUP_REDIRECT_URL = "/login/"
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "https://sunsetuploader.com/login"
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "https://sunsetuploader.com/login"
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True  # optional, but nice
 
-INSTALLED_APPS += ['storages']
+# ─── Email (Brevo SMTP) ──────────────
+EMAIL_BACKEND       = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST          = os.getenv("EMAIL_HOST", "smtp-relay.brevo.com")
+EMAIL_PORT          = int(os.getenv("EMAIL_PORT", 587))
+EMAIL_USE_TLS       = os.getenv("EMAIL_USE_TLS", "True") == "True"
+EMAIL_HOST_USER     = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL  = os.getenv("DEFAULT_FROM_EMAIL", "Sunset Uploader <noreply@sunsetuploader.com>")
+
+# ─── Security (important in production) ──────────────
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# ─── File storage (Cloudflare R2) ──────────────
+INSTALLED_APPS += ["storages"]
 
 DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-
 AWS_S3_ENDPOINT_URL = os.getenv("R2_ENDPOINT_URL")
 AWS_STORAGE_BUCKET_NAME = os.getenv("R2_BUCKET_NAME")
 AWS_ACCESS_KEY_ID = os.getenv("R2_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY")
 
-# JWT (long-lived access token only)
+# ─── JWT (long-lived access token only) ──────────────
 REST_USE_JWT = True
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=8),  # long token
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),   # not used by your flow, but must be present
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=8),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
 # Stripe stuff
