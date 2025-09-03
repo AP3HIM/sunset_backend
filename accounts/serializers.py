@@ -25,6 +25,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
 
         try:
+            logger.info(f"Request in serializer: {request}")
             get_adapter().send_confirmation_mail(request, user)
             logger.info(f"Confirmation email sent to {user.email}")
         except Exception as e:
