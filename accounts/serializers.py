@@ -2,14 +2,12 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
-from allauth.account.adapter import get_adapter
-from allauth.account.utils import setup_user_email
-from allauth.account.models import EmailAddress
+from allauth.account.utils import setup_user_email, send_email_confirmation
 import logging
 
 logger = logging.getLogger(__name__)
-
 User = get_user_model()
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -24,38 +22,21 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """
-        Create an inactive user and trigger the allauth confirmation email.
+        Create an inactive user, attach EmailAddress, and send confirmation.
         """
+        user = User.objects.create_user(is_active=False, **validated_data)
         request = self.context.get("request")
-        email = validated_data.get("email")
-
-        # Create inactive user
-        user = User.objects.create_user(
-            is_active=False,
-            **validated_data
-        )
 
         try:
-            # Ensure EmailAddress is created/linked
-            email_address, created = EmailAddress.objects.get_or_create(
-                user=user,
-                email=email,
-                defaults={"verified": False, "primary": True},
-            )
-
-            if not created:
-                email_address.verified = False
-                email_address.primary = True
-                email_address.save()
-
-            # Let allauth handle confirmation sending
+            # Ensure EmailAddress exists/linked
             setup_user_email(request, user, [])
-            get_adapter().send_confirmation_mail(request, user)
 
-            logger.info(f"Confirmation email sent to {email}")
+            # Trigger Allauth’s built-in confirmation flow
+            send_email_confirmation(request, user)
 
+            logger.info(f"[accounts] Sent confirmation email to {user.email}")
         except Exception as e:
-            logger.exception("Failed to send confirmation email")
+            logger.exception(f"[accounts] Failed to send confirmation email: {e}")
             from django.conf import settings
             if getattr(settings, "DEBUG", False):
                 raise
