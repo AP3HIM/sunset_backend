@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import dj_database_url
+import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -138,16 +139,18 @@ REST_AUTH_SERIALIZERS = {
     "TOKEN_OBTAIN_SERIALIZER": "accounts.jwt.VerifiedEmailTokenSerializer",
 }
 
+# Make SMTP logs super verbose
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "handlers": {"console": {"class": "logging.StreamHandler"}},
-    "root": {"handlers": ["console"], "level": "INFO"},
+    "handlers": {
+        "console": {"class": "logging.StreamHandler"},
+    },
+    "root": {"handlers": ["console"], "level": "DEBUG"},
     "loggers": {
-        "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
-        "django.core.mail": {"handlers": ["console"], "level": "DEBUG", "propagate": False},
-        "allauth": {"handlers": ["console"], "level": "DEBUG", "propagate": False},
-        "accounts": {"handlers": ["console"], "level": "DEBUG", "propagate": False},
+        "django": {"handlers": ["console"], "level": "DEBUG", "propagate": False},
+        "django.core.mail": {"handlers": ["console"], "level": "DEBUG"},
+        "smtplib": {"handlers": ["console"], "level": "DEBUG"},
     },
 }
 
