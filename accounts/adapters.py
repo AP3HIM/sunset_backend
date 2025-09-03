@@ -15,7 +15,9 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         return user
 
     def get_email_confirmation_url(self, request, emailconfirmation):
-        backend_base_url = os.environ.get("BACKEND_BASE_URL")
-        if not backend_base_url:
+        base = os.environ.get("BACKEND_BASE_URL")
+        if not base:
             raise ImproperlyConfigured("Missing BACKEND_BASE_URL environment variable")
-        return f"{backend_base_url}/api/accounts/confirm-email/{emailconfirmation.key}/"
+        base = base.rstrip("/")
+        # main urls likely include path("api/", ...), so append /api here:
+        return f"{base}/api/accounts/confirm-email/{emailconfirmation.key}/"
