@@ -27,21 +27,27 @@ class RegisterSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
 
         try:
-            # 1️ Ensure EmailAddress exists
-            setup_user_email(request, user, [user.email])
+            # 1️ Ensure an EmailAddress exists for this user
+            email_address, created = EmailAddress.objects.get_or_create(
+                user=user,
+                email=user.email,
+                defaults={"primary": True, "verified": False},
+            )
 
-            # 2️ Grab the primary EmailAddress object
-            email_address = EmailAddress.objects.get(user=user, email=user.email)
-            
-
-            # 3️ Create EmailConfirmation object
+            # 2️ Create EmailConfirmation object
             confirmation = EmailConfirmationHMAC(email_address)
 
-            # 4 Send confirmation via adapter
-            get_adapter(request).send_confirmation_mail(request, confirmation, signup=True)
-            logger.info(f"Confirm URL: {get_adapter(request).get_email_confirmation_url(request, confirmation)}")
+            # 3️ Send confirmation email via adapter
+            get_adapter(request).send_confirmation_mail(
+                request, confirmation, signup=True
+            )
 
+            # 4️ Debug: log the URL
+            logger.info(
+                f"Confirm URL: {get_adapter(request).get_email_confirmation_url(request, confirmation)}"
+            )
             logger.info(f"[accounts] Sent confirmation email to {user.email}")
+
         except Exception as e:
             logger.exception(f"[accounts] Failed to send confirmation email: {e}")
             from django.conf import settings
