@@ -25,13 +25,18 @@
     }
     a.button {
       display: inline-block;
-      background: #ffee00;
+      background: linear-gradient(135deg, #ffee00, #ffdd00);
       color: #111;
-      padding: 12px 24px;
+      padding: 14px 28px;
       border-radius: 8px;
       text-decoration: none;
       font-weight: bold;
       margin-top: 20px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+    a.button:hover {
+      background: linear-gradient(135deg, #d0ff00, #ffee00);
     }
     p {
       line-height: 1.8;
@@ -45,7 +50,9 @@
     <p>Hey {{ user.username }},</p>
     <p>Thanks for signing up with Sunset Uploader.</p>
     <p>Please click the button below to confirm your email address:</p>
-    <p><a href="{{ activate_url }}" class="button">Confirm Email</a></p>
+    <p><a href="{{ activate_url }}" class="button" target="_blank" rel="noopener">
+      Confirm Email</a>
+    </p>
     <p>If you didn’t sign up, you can safely ignore this email.</p>
     <p style="margin-top: 30px;">– The Sunset Uploader Team</p>
   </div>
