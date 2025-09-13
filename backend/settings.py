@@ -254,6 +254,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Attach our custom username validator to Django's User model
+AUTH_USERNAME_VALIDATORS = [
+    {"NAME": "accounts.validators.CustomUsernameValidator"},
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
