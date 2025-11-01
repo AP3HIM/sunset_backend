@@ -67,7 +67,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://sunset-frontend.netlify.app",
     "https://sunsetuploader.com",
     "https://www.sunsetuploader.com",
-     "https://sunset-backend.onrender.com",
+    # "https://sunset-backend.onrender.com",
 ]
 
 # Application definition
@@ -278,10 +278,6 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # Media files (for uploaded content)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
-
-CORS_ORIGIN_WHITELIST = [
-    "http://localhost:5173",  # Vite dev server
-]
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = ["DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT"]
