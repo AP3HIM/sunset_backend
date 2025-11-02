@@ -67,6 +67,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://sunset-frontend.netlify.app",
     "https://sunsetuploader.com",
     "https://www.sunsetuploader.com",
+    "https://api.sunsetuploader.com",
     # "https://sunset-backend.onrender.com",
 ]
 
