@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
- 
+
 from pathlib import Path
 from datetime import timedelta
 import dj_database_url
@@ -91,6 +91,8 @@ INSTALLED_APPS = [
     'api',
     'billing',
 ]
+
+INSTALLED_APPS += ["anymail"]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -179,13 +181,12 @@ ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "https://sunsetuploader.
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True  # optional, but nice
 
 # ─── Email (Brevo SMTP) ──────────────
-EMAIL_BACKEND       = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
-EMAIL_HOST          = os.getenv("EMAIL_HOST", "smtp-relay.brevo.com")
-EMAIL_PORT          = int(os.getenv("EMAIL_PORT", 587))
-EMAIL_USE_TLS       = os.getenv("EMAIL_USE_TLS", "True") == "True"
-EMAIL_HOST_USER     = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+EMAIL_BACKEND       = os.getenv("EMAIL_BACKEND", "anymail.backends.brevo.EmailBackend")
 DEFAULT_FROM_EMAIL  = os.getenv("DEFAULT_FROM_EMAIL", "Sunset Uploader <noreply@sunsetuploader.com>")
+
+ANYMAIL = {
+    "BREVO_API_KEY": os.getenv("BREVO_API_KEY"),
+}
 
 # ─── Security (important in production) ──────────────
 SESSION_COOKIE_SECURE = True
@@ -297,4 +298,3 @@ CSRF_TRUSTED_ORIGINS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
