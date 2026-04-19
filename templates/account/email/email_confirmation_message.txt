@@ -1,0 +1,10 @@
+Hi {{ user.username }},
+
+Please confirm your email by clicking the following link:
+
+{{ activate_url }}
+
+If you didn't register for an account, you can ignore this.
+
+Thanks,
+The SunsetUploader Team
