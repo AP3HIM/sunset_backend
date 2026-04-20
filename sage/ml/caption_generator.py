@@ -88,7 +88,7 @@ def generate_caption_v03(
         variants = [row["caption"]]
 
         # Mutation is OPTIONAL, not mandatory
-        if random.random() < 0.6:
+        if False:  # disabled - too slow
             variants += mutate_caption(base_caption, row["caption"])
 
         for variant in variants:

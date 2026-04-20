@@ -41,11 +41,11 @@ def suggest_captions(prompt, genre=None, top_k=5):
     )
 
     return [{
-        "caption": r["caption"],
-        "genre": r["genre"],
-        "platform": r["platform"],
-        "score": r["final_score"]
-    } for r in top_rows]
+        "caption": r.get("caption", ""),
+        "genre": r.get("genre", ""),
+        "platform": r.get("platform", ""),
+        "score": r.get("final_score", 0.0)
+    } for r in top_rows if r.get("caption")]
 
 def is_bad_template(caption):
     bad_patterns = [
@@ -64,19 +64,21 @@ def diverse_top_k(df, embeddings, k=5, max_sim=0.85):
     selected_embeddings = []
 
     for idx, row in df.iterrows():
+        # Guard against index being out of bounds
+        if idx >= len(embeddings):
+            continue
+
         emb = embeddings[idx]
 
         if not selected:
-            selected.append(row)
+            selected.append(row.to_dict())
             selected_embeddings.append(emb)
             continue
 
-        sims = cosine_similarity(
-            [emb], selected_embeddings
-        )[0]
+        sims = cosine_similarity([emb], selected_embeddings)[0]
 
         if sims.max() < max_sim:
-            selected.append(row)
+            selected.append(row.to_dict())
             selected_embeddings.append(emb)
 
         if len(selected) >= k:

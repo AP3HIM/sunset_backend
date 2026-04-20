@@ -57,10 +57,8 @@ ALLOWED_HOSTS = [
     "www.sunsetuploader.com",
     "sunset-frontend.netlify.app",
     "api.sunsetuploader.com",
-    '''
     "127.0.0.1",
     "localhost",
-    '''
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -90,6 +88,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'api',
     'billing',
+    'sage',
 ]
 
 INSTALLED_APPS += ["anymail"]
@@ -150,11 +149,11 @@ LOGGING = {
     "handlers": {
         "console": {"class": "logging.StreamHandler"},
     },
-    "root": {"handlers": ["console"], "level": "DEBUG"},
+    "root": {"handlers": ["console"], "level": "WARNING"},
     "loggers": {
-        "django": {"handlers": ["console"], "level": "DEBUG", "propagate": False},
-        "django.core.mail": {"handlers": ["console"], "level": "DEBUG"},
-        "smtplib": {"handlers": ["console"], "level": "DEBUG"},
+        "django": {"handlers": ["console"], "level": "WARNING", "propagate": False},
+        "django.core.mail": {"handlers": ["console"], "level": "WARNING"},
+        "smtplib": {"handlers": ["console"], "level": "WARNING"},
     },
 }
 
@@ -284,7 +283,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = ["DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT"]
 CORS_ALLOW_ALL_HEADERS = True
- 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 CSRF_TRUSTED_ORIGINS = [

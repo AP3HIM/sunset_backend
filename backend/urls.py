@@ -24,4 +24,5 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),  # Add this
     path("api/accounts/", include("accounts.urls")),
     path('billing/', include('billing.urls')),
+    path("api/sage/", include("sage.urls")),
 ]
