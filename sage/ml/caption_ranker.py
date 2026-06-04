@@ -8,25 +8,31 @@ from sklearn.metrics.pairwise import cosine_similarity
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 EMBEDDINGS_PATH = os.path.join(BASE_DIR, "data", "caption_embeddings.pkl")
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
+_model = None
+_captions_df = None
+_caption_embeddings = None
 
-with open(EMBEDDINGS_PATH, "rb") as f:
-    data = pickle.load(f)
-
-captions_df = data["captions"]
-caption_embeddings = data["embeddings"]
+def _load():
+    global _model, _captions_df, _caption_embeddings
+    if _model is None:
+        _model = SentenceTransformer("all-MiniLM-L6-v2")
+        with open(EMBEDDINGS_PATH, "rb") as f:
+            data = pickle.load(f)
+        _captions_df = data["captions"]
+        _caption_embeddings = data["embeddings"]
 
 def suggest_captions(prompt, genre=None, top_k=5):
-    prompt_embedding = model.encode([prompt])
-    sims = cosine_similarity(prompt_embedding, caption_embeddings)[0]
+    _load()
+    prompt_embedding = _model.encode([prompt])
+    sims = cosine_similarity(prompt_embedding, _caption_embeddings)[0]
 
-    captions_df["score"] = sims
-    captions_df["boost"] = captions_df["source"].apply(
+    _captions_df["score"] = sims
+    _captions_df["boost"] = _captions_df["source"].apply(
         lambda x: 1.15 if x == "mostPopular" else 1.0
     )
-    captions_df["final_score"] = captions_df["score"] * captions_df["boost"]
+    _captions_df["final_score"] = _captions_df["score"] * _captions_df["boost"]
 
-    filtered = captions_df
+    filtered = _captions_df
     if genre:
         filtered = filtered[filtered["genre"] == genre]
 
@@ -36,7 +42,7 @@ def suggest_captions(prompt, genre=None, top_k=5):
 
     top_rows = diverse_top_k(
         sorted_df,
-        caption_embeddings,
+        _caption_embeddings,
         top_k
     )
 
