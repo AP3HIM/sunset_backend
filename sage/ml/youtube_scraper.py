@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import pandas as pd
@@ -5,9 +6,16 @@ import time
 import os
 import re
 
-API_KEY = "AIzaSyBm_eMLOYrPqgJtLtZL2PiFtj8HIw-OfEs"
+load_dotenv()
+
+API_KEY = os.getenv("API_KEY")
+
+if not API_KEY:
+    raise ValueError("API_KEY not found in .env")
 
 youtube = build("youtube", "v3", developerKey=API_KEY)
+
+DATA_PATH = "sage/ml/data/captions.csv"
 
 DATA_PATH = "sage/ml/data/captions.csv"
 
