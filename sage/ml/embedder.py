@@ -2,7 +2,7 @@ from sentence_transformers import SentenceTransformer
 
 _model = None
 
-def get_model():
+def get_embedder():
     global _model
 
     if _model is None:
