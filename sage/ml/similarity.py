@@ -1,16 +1,12 @@
-from sentence_transformers import SentenceTransformer
 import numpy as np
+from sage.ml.embedder import get_embedder
 
-_embedder = None
-
-def get_embedder():
-    global _embedder
-    if _embedder is None:
-        _embedder = SentenceTransformer("all-MiniLM-L6-v2")
-    return _embedder
 
 def cosine_sim(a, b):
-    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+    return np.dot(a, b) / (
+        np.linalg.norm(a) * np.linalg.norm(b)
+    )
+
 
 def similarity_penalty(prompt, caption):
     embedder = get_embedder()

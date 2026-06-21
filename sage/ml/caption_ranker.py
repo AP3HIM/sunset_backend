@@ -2,29 +2,37 @@ import os
 import pickle
 import re
 import numpy as np
-from sentence_transformers import SentenceTransformer
+from sage.ml.embedder import get_embedder
 from sklearn.metrics.pairwise import cosine_similarity
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 EMBEDDINGS_PATH = os.path.join(BASE_DIR, "data", "caption_embeddings.pkl")
 
-_model = None
 _captions_df = None
 _caption_embeddings = None
 
 def _load():
-    global _model, _captions_df, _caption_embeddings
-    if _model is None:
-        _model = SentenceTransformer("all-MiniLM-L6-v2")
+    global _captions_df, _caption_embeddings
+
+    if _captions_df is None:
         with open(EMBEDDINGS_PATH, "rb") as f:
             data = pickle.load(f)
+
         _captions_df = data["captions"]
         _caption_embeddings = data["embeddings"]
 
 def suggest_captions(prompt, genre=None, top_k=5):
     _load()
-    prompt_embedding = _model.encode([prompt])
-    sims = cosine_similarity(prompt_embedding, _caption_embeddings)[0]
+    model = get_embedder()
+    prompt_embedding = model.encode(
+        [prompt],
+        convert_to_numpy=True
+    )
+
+    sims = cosine_similarity(
+        prompt_embedding,
+        _caption_embeddings
+    )[0]
 
     _captions_df["score"] = sims
     _captions_df["boost"] = _captions_df["source"].apply(
@@ -32,7 +40,7 @@ def suggest_captions(prompt, genre=None, top_k=5):
     )
     _captions_df["final_score"] = _captions_df["score"] * _captions_df["boost"]
 
-    filtered = _captions_df
+    filtered = _captions_df.copy()
     if genre:
         filtered = filtered[filtered["genre"] == genre]
 
