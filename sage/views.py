@@ -32,7 +32,7 @@ def generate_captions(request):
         ranked = suggest_captions(
             base_caption,
             genre=None,
-            top_k=5
+            top_k=15
         )
 
         print("Suggest:", time.time() - t1)

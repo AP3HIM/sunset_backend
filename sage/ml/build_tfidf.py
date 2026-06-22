@@ -18,6 +18,22 @@ OUTPUT_PATH = os.path.join(
     "tfidf_data.pkl"
 )
 
+SPORT_WORDS = [
+    "baseball",
+    "football",
+    "nba",
+    "nfl",
+    "pitch",
+    "catch",
+    "home run",
+]
+
+GAME_WORDS = [
+    "minecraft",
+    "fortnite",
+    "valorant",
+]
+
 df = pd.read_csv(DATA_PATH)
 
 vectorizer = TfidfVectorizer(

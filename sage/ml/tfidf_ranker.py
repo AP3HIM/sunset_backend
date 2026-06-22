@@ -63,7 +63,7 @@ def suggest_captions(prompt, genre=None, top_k=5):
         ascending=False
     )
 
-    rows = df.head(top_k)
+    rows = df.head(top_k * 3)
 
     return [
         {
