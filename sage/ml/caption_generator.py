@@ -22,7 +22,7 @@ from sage.ml.platform_rules import hook_template_penalty
 #from sage.ml.pairwise_ranker import pairwise_score
 from sage.ml.caption_mutator import mutate_caption
 
-from sage.ml.gb_scorer import gb_score
+from sage.ml.gb.gb_scorer import gb_score
 
 EMOJIS = ["🔥", "🤯", "👀", "🏈"]
 
