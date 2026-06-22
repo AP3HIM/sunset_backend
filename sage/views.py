@@ -7,7 +7,8 @@ from django.views.decorators.http import require_POST
 import json
 
 from sage.ml.caption_generator import generate_caption_v03
-from sage.ml.caption_ranker import suggest_captions
+#from sage.ml.caption_ranker import suggest_captions
+from sage.ml.tfidf_ranker import suggest_captions
 
 import traceback
 import time
