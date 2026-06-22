@@ -12,7 +12,7 @@ from sage.ml.platform_rules import (
     informational_density_score,
     hook_template_penalty,
 )
-from sage.ml.similarity import similarity_penalty
+#from sage.ml.similarity import similarity_penalty
 
 
 def extract_features(base, caption, platform):
@@ -24,7 +24,8 @@ def extract_features(base, caption, platform):
         "avg_word_len": sum(len(w) for w in words) / max(len(words), 1),
 
         # semantic / intent
-        "similarity": similarity_penalty(base, caption),
+        # "similarity": similarity_penalty(base, caption),
+        "similarity": 0,
         "intent": intent_penalty(caption, base),
 
         # content quality

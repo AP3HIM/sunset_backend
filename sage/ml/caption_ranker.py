@@ -2,7 +2,7 @@ import os
 import pickle
 import re
 import numpy as np
-from sage.ml.embedder import get_embedder
+#from sage.ml.embedder import get_embedder
 from sklearn.metrics.pairwise import cosine_similarity
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -23,16 +23,21 @@ def _load():
 
 def suggest_captions(prompt, genre=None, top_k=5):
     _load()
+    '''
     model = get_embedder()
     prompt_embedding = model.encode(
         [prompt],
         convert_to_numpy=True
     )
-
+    '''
+    '''
     sims = cosine_similarity(
         prompt_embedding,
         _caption_embeddings
     )[0]
+    '''
+
+    sims = np.random.random(len(_captions_df))
 
     _captions_df["score"] = sims
     _captions_df["boost"] = _captions_df["source"].apply(
@@ -47,12 +52,15 @@ def suggest_captions(prompt, genre=None, top_k=5):
     sorted_df = filtered[
         ~filtered["caption"].apply(is_bad_template)
     ].sort_values("final_score", ascending=False)
-
+    '''
     top_rows = diverse_top_k(
         sorted_df,
         _caption_embeddings,
         top_k
     )
+    '''
+    
+    top_rows = sorted_df.head(top_k).to_dict("records")
 
     return [{
         "caption": r.get("caption", ""),

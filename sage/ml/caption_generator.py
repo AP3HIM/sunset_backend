@@ -16,10 +16,10 @@ from sage.ml.platform_rules import hook_pattern_score
 from sage.ml.platform_rules import informational_density_score
 from sage.ml.platform_rules import hook_template_penalty
 
-from sage.ml.feedback_scorer import feedback_score
-from sage.ml.similarity import similarity_penalty
+#from sage.ml.feedback_scorer import feedback_score
+#from sage.ml.similarity import similarity_penalty
 
-from sage.ml.pairwise_ranker import pairwise_score
+#from sage.ml.pairwise_ranker import pairwise_score
 from sage.ml.caption_mutator import mutate_caption
 
 from sage.ml.gb.gb_ranker import gb_score
@@ -103,7 +103,7 @@ def generate_caption_v03(
             score += generic_penalty(final)
             score += intent_penalty(final, base_caption) *0.6
 
-            sim = similarity_penalty(base_caption, final)
+            sim = 0
             score += sim * 0.5
 
             score += casualness_score(final) *1.3
@@ -112,8 +112,8 @@ def generate_caption_v03(
             score += hook_template_penalty(final)
             score += informational_density_score(final) * 1.2
 
-            score += feedback_score(base_caption, final) * 2
-            score += 0.5 * pairwise_score(base_caption, final)
+           # score += feedback_score(base_caption, final) * 2
+           # score += 0.5 * pairwise_score(base_caption, final)
 
             hook_score = hook_pattern_score(final)
             score += hook_score
@@ -147,10 +147,7 @@ def generate_caption_v03(
 
         overlap = 0.0
         for f in finals:
-            overlap += max(
-                0,
-                similarity_penalty(cand["caption"], f["caption"]) * -1
-            )
+            pass
 
         # reject if too similar to already-picked captions
         if overlap > 0.6:
